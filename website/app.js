@@ -1,79 +1,63 @@
-// Creating a new date instance dynamically with JS
-// global var
-let d = new Date();
-let newDate = d.toDateString();
+// const { json } = require("body-parser");
+
+/* Global Variables */
 const baseURL = "https://api.openweathermap.org/data/2.5/weather?zip=";
-const apiKey = ",&appid=e7882d553d7b100bd08be571fe82e9be";
-const server = "http://localhost:4000";
-// showing the error to the user
-const error = document.getElementById("error");
+const apiKey = "e7882d553d7b100bd08be571fe82e9be";
+const zip = document.getElementById("zip");
+const feelings = document.getElementById("feelings");
+const generate = document.getElementById("generate");
+// Create a new date instance dynamically with JS
+const d = new Date();
+const newDate = `${d.getMonth()+1}.${d.getDate()}.${d.getFullYear()}`;
 // Event listener to add function to existing HTML DOM element
-// Function called by event listener
-const WeatherData = async (zip) => {
-    try {
-      const response = await fetch(baseURL+zip+apiKey);
-      const data = await response.json();
-      if (data.cod != 200) {
-        error.innerHTML = data.message;
-        setTimeout(_=> error.innerHTML = '', 2000)
-        throw `${data.message}`;
-      }
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  // Function to POST data
-const postData = async (url = "", info = {}) => {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(info)
-       });
-    try {
-      const newData = await response.json();
-      console.log(`You just saved`, newData);
-      return newData;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-document.getElementById("generate").addEventListener("click", () => { 
-    //get value after click on the button
-    const zip = document.getElementById("zip").value;
-    const feelings = document.getElementById("feelings").value;
-    // getWeatherData return promise
-    WeatherData(zip).then((data) => {
-      //making sure from the received data to execute rest of the steps
-      if (data) {
-        const {
-          main: { temp },
-          name: city,
-          weather: [{ description }],
-        } = data;
-        const info = {
-          newDate,
-          city,
-          temp: Math.round(temp), // to get integer number
-          description,
-          feelings,
-        };
-        postData(server + "/addAll", info);
-        update();
-        document.getElementById('entry').style.opacity = 1;
-      }
+document.getElementById("generate").addEventListener("click", async function weather(){
+    const url = `${baseURL}${zip.value}&appid=${apiKey}&units=metric`;
+    const weather = getTemep(url);
+    await sendData({
+        // temp: weather.main.temp ,
+        Date : newDate,
+        feelings: feelings.value
     });
-  });
-  const update = async () => {
-    const response = await fetch(server + "/getAll");
-    try {
-      const submiteDate = await response.json();
-      document.getElementById("date").innerHTML = submiteDate.newDate;
-      document.getElementById("city").innerHTML = submiteDate.city;
-      document.getElementById("temp").innerHTML = submiteDate.main.temp+ '&degC';
-      document.getElementById("description").innerHTML = submiteDate.weather.description;
-      document.getElementById("content").innerHTML = submiteDate.feelings;
-    } catch (error) {
-      console.log(error);
+    getWeb()
+})
+/* Function to GET Project Data */
+async function getTemep(url){
+    const request = await fetch(url);
+    try{
+        const result = await request.json();
+        return result;
+    } catch(err){
+        console.log(err);
     }
-  };
+}
+/* Function to POST data */
+async function sendData(data){
+    const request = await fetch("/addAll",{
+        method:'POST',
+        credentials:'same-origin',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    try{
+        const result = await request.JSON();
+        return result;
+    } 
+    catch(err) {
+        console.log(err);
+    }
+}
+/* Function to GET Web API Data*/
+async function getWeb(){
+    const request = await fetch("/getAll");
+    try{
+        const result = await request.JSON();
+        document.getElementById("date").innerHTML=`today is ${result.Date}`
+        document.getElementById("temp").innerHTML=`temp today is ${result.temp}`
+        document.getElementById("content").innerHTML=`feelings  ${result.feelings}`
+    }
+    catch(err){
+        console.log(err);
+    }
+}
