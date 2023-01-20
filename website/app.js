@@ -14,7 +14,7 @@ document.getElementById("generate").addEventListener("click", async function wea
     const url = `${baseURL}${zip.value}&appid=${apiKey}&units=metric`;
     const weather = getTemep(url);
     await sendData({
-        // temp: weather.main.temp ,
+        temp: weather.main.temp ,
         Date : newDate,
         feelings: feelings.value
     });
