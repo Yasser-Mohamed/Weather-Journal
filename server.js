@@ -12,14 +12,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 // Setup empty JS array to act as endpoint for all routes
-const projectData = [];
 // Initialize the main project folder
 app.use(express.static("./website"));
 // Callback function to complete GET '/all'
 // GET Route
 app.get("/get", (request, response) => {
   response.send(projectData);
-  projectData = [];
+  projectData = {};
 });
 // GET Route
 app.post("/post", (request, response) => {
@@ -29,8 +28,9 @@ app.post("/post", (request, response) => {
       date : request.body.date,
       content : request.body.content
     }
-    projectData.push(newEnt)
+    projectData =newEnt
   });
+let projectData={};
 const port = 4000;
 const hostname = "localhost";
 // function to test the server 
