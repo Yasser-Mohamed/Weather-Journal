@@ -1,6 +1,6 @@
 /* Global Variables */
 const baseURL = "https://api.openweathermap.org/data/2.5/weather?zip=";
-const apiKey = ",&appid=e7882d553d7b100bd08be571fe82e9be";
+const apiKey = ",&appid=e7882d553d7b100bd08be571fe82e9be&units=metric";
 const zip = document.getElementById("zip");
 const feelings = document.getElementById("feelings");
 const generate = document.getElementById("generate");
@@ -19,8 +19,7 @@ function action(el){
             date : newDate,
             temp: data.main.temp
         })
-    });
-    updateUI();
+    }).then(()=>updateUI())
 }
 /* Function to GET Project Data */
 async function getWeather(baseURL,zip,api){
@@ -59,7 +58,7 @@ async function updateUI(){
     try{
         const allData = await request.json();
         document.getElementById("date").innerHTML=`Date today is : ${newDate}`;
-        document.getElementById("temp").innerHTML=`temp today is : ${allData[0].temp}`;
+        document.getElementById("temp").innerHTML=`temp today is : ${allData.temp}`;
         document.getElementById("content").innerHTML=`feelings : ${feelings.value}`;
     }
     catch(err){
